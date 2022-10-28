@@ -1,4 +1,4 @@
-import { WinstonOption } from '../interface/Logger';
+import { WinstonOption } from '../interfaces/Logger';
 import winston from 'winston';
 
 const consoleFormat = winston.format.combine(

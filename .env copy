@@ -1,4 +1,7 @@
 PORT=8080
+ENV=DEBUG
+SECRET=secret
+EXPIRES_IN=30d
 
 DB_URI=mongodb://localhost:27017/qrchat
 DB_USERNAME=

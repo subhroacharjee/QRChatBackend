@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { DbConnectionPayload } from '../interface/Connection';
+import { DbConnectionPayload } from '../interfaces/Connection';
 import Logger from './log';
 
 class DatabaseConnection {
