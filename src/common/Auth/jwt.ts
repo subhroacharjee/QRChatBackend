@@ -2,16 +2,13 @@ import jwt from 'jsonwebtoken';
 import Logger from '../log';
 
 
-const SECRET_KEY:string = process.env.SECRET;
-const EXPIRES_IN:string = process.env.EXPIRES_IN;
-
 /**
  * @param  {any} data any object that is serializable.
  * @return {string}
  */
 export const generateToken = (data:any) => {
-	return jwt.sign(data, SECRET_KEY, {
-		expiresIn: EXPIRES_IN,
+	return jwt.sign(data, process.env.SECRET, {
+		expiresIn: process.env.EXPIRES_IN,
 	});
 };
 
@@ -21,7 +18,7 @@ export const generateToken = (data:any) => {
  */
 export const validateToken = async (token:string) => {
 	try {
-		const data = await jwt.verify(token, SECRET_KEY);
+		const data = await jwt.verify(token, process.env.SECRET);
 		return [null, data];
 	} catch(error) {
 		Logger.error(JSON.stringify(error));
