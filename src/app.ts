@@ -1,3 +1,4 @@
+import AuthenticateRequest from './middlewares/Auth';
 import BaseRouter from './routes';
 import Cors from 'cors';
 import Database from './common/db';
@@ -26,7 +27,7 @@ app.use(morgan('dev'));
 app.use(bodyParser.urlencoded({
 	extended: true
 }));
-
+app.use(AuthenticateRequest);
 app.use(bodyParser.json());
 
 app.get('/_healthcheck', (_req, res) => {

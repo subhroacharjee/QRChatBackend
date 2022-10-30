@@ -1,4 +1,5 @@
 import * as AuthController from '../controllers/Auth.Controller';
+import { CurrentUser } from '../interfaces/Responses/Auth';
 import { Request, Response, Router } from 'express';
 import { validationResult } from 'express-validator';
 import { LoginValidator, RegisterValidator } from '../common/Validators/Auth';
@@ -79,13 +80,15 @@ AuthRouter.post('/login', LoginValidator, (req: Request, res: Response) => {
 		});
 });
 
-// TODO: add Auth middleware
-AuthRouter.post('/user', (req, res) => {
+AuthRouter.get('/user', (req, res) => {
+	let currentUser:CurrentUser;
+	if (req.headers.currentUser && typeof req.headers.currentUser === 'string') {
+		currentUser = JSON.parse(req.headers.currentUser || '{}');
+	}
+	
 	res.status(200).json({
 		status: 'success',
-		data: {
-			message: 'working'
-		}
+		data: currentUser
 	});
 });
 

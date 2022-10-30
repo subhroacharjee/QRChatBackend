@@ -7,7 +7,7 @@ import { createMongooseValidationError } from '../common/functions';
 import { generateToken } from '../common/Auth/jwt';
 import { UserResponse } from '../interfaces/Responses/Auth';
 import { ControllerReturnType } from '../interfaces/Responses/Controller';
-import { Default500Response } from '../common/Constants/Default500Status';
+import { Default500Response } from '../common/Constants/DefaultErrStatus';
 
 /**
  * @param  {LoginPayload} data
@@ -22,7 +22,7 @@ export const login = async(data:LoginPayload): Promise<ControllerReturnType<User
 		if (!user) {
 			return {
 				error: {
-					message: ['Invalid email/password'],
+					email: ['Invalid email/password'],
 				},
 				data: null
 			};
@@ -32,7 +32,7 @@ export const login = async(data:LoginPayload): Promise<ControllerReturnType<User
 		if (!verifyHash(data.password, hashedPassword)) {
 			return {
 				error: {
-					message: ['Invalid email/password'],
+					email: ['Invalid email/password'],
 				},
 				data: null
 			};

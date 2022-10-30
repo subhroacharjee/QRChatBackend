@@ -1,5 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import jwt from 'jsonwebtoken';
 import Logger from '../log';
+import { ControllerReturnType } from '../../interfaces/Responses/Controller';
 
 
 /**
@@ -16,12 +18,26 @@ export const generateToken = (data:any) => {
  * @param  {string} token
  * @return {any[]} arr[0] -> error message, arr[1] -> data 
  */
-export const validateToken = async (token:string) => {
+export const validateToken = async (token:string, fieldsToexport?: string[]):Promise<ControllerReturnType<any>> => {
 	try {
-		const data = await jwt.verify(token, process.env.SECRET);
-		return [null, data];
+		let data:any = await jwt.verify(token, process.env.SECRET);
+		if (fieldsToexport && fieldsToexport.length > 0) {
+			const newData:any = {};
+			for (const index in fieldsToexport) {
+				const field = fieldsToexport[index];
+				newData[field] = data[field];
+			}
+			data = newData;
+		}
+		return {
+			error: null,
+			data: data
+		};
 	} catch(error) {
 		Logger.error(JSON.stringify(error));
-		return [error.message, null];
+		return {
+			error: error.message,
+			data: null
+		};
 	}
 };
