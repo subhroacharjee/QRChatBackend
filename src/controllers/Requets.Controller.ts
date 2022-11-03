@@ -8,6 +8,7 @@ import BlockedRequestModel from '../models/BlockRequest.model';
 import { HandlerEnum, RequestHandleType } from '../interfaces/Model/Requets';
 import _ from 'lodash';
 import { Default500Response } from '../common/Constants/DefaultErrStatus';
+import { CreateConnection } from './Connections.Controller';
 
 export const GetAllPendingRequests = async (currentUser: CurrentUser): Promise<ControllerReturnType<PendingObject[]>> => {
 	try {
@@ -128,12 +129,19 @@ export const handleRequest = async (payload: {
 		
 		if (theRequest !== null && theRequest.handlerType === 'PENDING') {
 			theRequest.handlerType = payload.handleType;
-			await theRequest.save();
 
 			if (payload.handleType === 'ACCEPTED') {
-				// TODO: add connection between the two users
-				// 2 model will be created hence the model for connection
-				
+				const isSuccess = await CreateConnection({
+					_uid1: theRequest.sender._id.toString(), 
+					_uid2: theRequest.reciever._id.toString(), 
+					key: theRequest.key
+				});
+
+				if (!isSuccess) {
+					Logger.error('New Connection was not made due to error');
+					return;
+				}
+				await theRequest.save();
 				const reverseKey = theRequest.key.split('#').reverse().join('#');
 				await BlockedRequestModel.deleteMany({
 					key: reverseKey
@@ -143,6 +151,8 @@ export const handleRequest = async (payload: {
 					key: reverseKey
 				}).where('handlerType').in([HandlerEnum.DENIED, HandlerEnum.PENDING])
 					.exec();
+			} else {
+				await theRequest.save();
 			}
 			Logger.debug('Connection is ' + payload.handleType);
 			return;

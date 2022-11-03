@@ -37,6 +37,8 @@ RequestRouter.get('/', (req: Request, res: Response) => {
 				error: 'Something went wrong'
 			});
 		});
+	} else {
+		res.status(403).send();
 	}
 });
 
