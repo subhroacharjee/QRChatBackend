@@ -13,7 +13,7 @@ const AuthenticateRequest = async (req: Request, res: Response, next: NextFuncti
 	if (!ListOfPathToIgnoreInAuthMiddleware.includes(req.path) && req.path.includes('/api')) {
 		const authorizationHeader = req.headers.authorization;
 		if (!authorizationHeader || !authorizationHeader.includes('Bearer ')) {
-			const status = parseInt(err.error._xstatus[0]);
+			const status = parseInt(err.error?._xstatus[0] || '403');
 			delete err.error._xstatus;
 			res.status(status)
 				.json({
@@ -29,7 +29,7 @@ const AuthenticateRequest = async (req: Request, res: Response, next: NextFuncti
 			if (validationResult.error !== null || !_.every(userObjectRequiredKeys, _.partial(_.has, validationResult.data))) {
 
 				err.error.message = ['Invalid token'];
-				const status = parseInt(err.error._xstatus[0]);
+				const status = 403;
 				delete err.error._xstatus;
 				res.status(status)
 					.json({
@@ -42,7 +42,7 @@ const AuthenticateRequest = async (req: Request, res: Response, next: NextFuncti
 			const user = await UserModel.findById(validationResult.data._id).select(['-password', '-__v']).exec();
 			if (user === null) {
 				err.error.message = ['Invalid token'];
-				const status = parseInt(err.error._xstatus[0]);
+				const status = 403;
 				delete err.error._xstatus;
 				res.status(status)
 					.json({
