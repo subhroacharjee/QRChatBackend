@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import { Socket } from 'socket.io';
 import { Default403Response, Default500Response } from '../common/Constants/DefaultErrStatus';
 import { NextFunction, Request, Response } from 'express';
 import { ListOfPathToIgnoreInAuthMiddleware, userObjectRequiredKeys } from '../common/Constants/PathConstants';
@@ -65,6 +66,29 @@ const AuthenticateRequest = async (req: Request, res: Response, next: NextFuncti
 				});
 			return;
 		}
+		
+	}
+	next();
+};
+
+export const AuthenticateWSRequest = async (socket: Socket, next: (err?:any) => void) => {
+	const authorizationHeader = socket.request.headers.authorization;
+	try {
+		const token = authorizationHeader.split('Bearer ')[1];
+		const validationResult = await validateToken(token, userObjectRequiredKeys);
+		if (validationResult.error !== null || !_.every(userObjectRequiredKeys, _.partial(_.has, validationResult.data))) {
+			next(new Error('Invalid token'));
+		}
+
+		const user = await UserModel.findById(validationResult.data._id).select(['-password', '-__v']).exec();
+		if (user === null) {
+			next(new Error('Invalid token'));
+		}
+
+		socket.request.headers.currentUser = JSON.stringify(user.toJSON());
+	} catch (error) {
+		Logger.error(error.message);
+		next(error);
 		
 	}
 	next();

@@ -1,7 +1,7 @@
 import Logger from '../common/log';
 import UserModel from '../models/User.model';
 import { hash, verifyHash } from '../common/Auth/hash';
-import { UserInterface } from '../interfaces/Model/User';
+import { User } from '../interfaces/Model/User';
 import { LoginPayload, RegisterPayload } from '../interfaces/Requests/Auth';
 import { createMongooseValidationError } from '../common/functions';
 import { generateToken } from '../common/Auth/jwt';
@@ -71,7 +71,7 @@ export const login = async(data:LoginPayload): Promise<ControllerReturnType<User
  */
 export const register = async(data:RegisterPayload): Promise<ControllerReturnType<UserResponse>> => {
 	
-	const userData:UserInterface = {
+	const userData:User = {
 		username: data.username,
 		email: data.email,
 		password: hash(data.password)

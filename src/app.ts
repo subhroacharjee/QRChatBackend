@@ -7,6 +7,9 @@ import bodyParser from 'body-parser';
 import express from 'express';
 import morgan from 'morgan';
 import { config } from 'dotenv';
+import { createServer } from 'http';
+import SocketManager from './socket';
+import EventRouteLoader from './routes/WebsocketEvents';
 
 // loading .env to process.env
 config();
@@ -22,6 +25,8 @@ Database.connect({
 
 
 const app = express();
+
+
 app.use(Cors());
 app.use(morgan('dev'));
 app.use(bodyParser.urlencoded({
@@ -38,7 +43,11 @@ app.get('/_healthcheck', (_req, res) => {
 
 app.use('/api', BaseRouter);
 
-app.listen(PORT, () => {
+const server = createServer(app);
+SocketManager.setServer(server);
+EventRouteLoader();
+
+server.listen(PORT, () => {
 	Logger.info('App started at port ' + PORT);
 });
 

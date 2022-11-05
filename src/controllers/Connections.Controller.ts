@@ -7,6 +7,7 @@ import RequestModel from '../models/Request.model';
 import { Default500Response } from '../common/Constants/DefaultErrStatus';
 import { HandlerEnum } from '../interfaces/Model/Requets';
 import { ConnectionObject } from '../interfaces/Responses/Connection';
+import MessageModel from '../models/MessageModel';
 
 export const CreateConnection = async (payload: {_uid1: string , _uid2: string, key:string}) => {
 	try {
@@ -67,6 +68,10 @@ export const DeleteConnection = async (payload: {
 			key: payload.connectionKey
 		}).where('handlerType').in([HandlerEnum.ACCEPTED, HandlerEnum.PENDING])
 			.exec();
+
+		await MessageModel.deleteMany({
+			connectionKey: payload.connectionKey
+		}).exec();
 
 		await ConnectionModel.deleteMany({
 			key: payload.connectionKey
