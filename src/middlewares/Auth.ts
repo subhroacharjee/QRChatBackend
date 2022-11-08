@@ -72,7 +72,7 @@ const AuthenticateRequest = async (req: Request, res: Response, next: NextFuncti
 };
 
 export const AuthenticateWSRequest = async (socket: Socket, next: (err?:any) => void) => {
-	const authorizationHeader = socket.request.headers.authorization;
+	const authorizationHeader = socket.handshake.headers.authorization;
 	try {
 		const token = authorizationHeader.split('Bearer ')[1];
 		const validationResult = await validateToken(token, userObjectRequiredKeys);
