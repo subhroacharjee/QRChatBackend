@@ -7,7 +7,7 @@ import MessageModel from '../models/MessageModel';
 
 import * as Events from '../common/Constants/Events';
 import { ControllerReturnType } from '../interfaces/Responses/Controller';
-import { MessageResponseObject } from '../interfaces/Responses/Message';
+import { MessageResponseObject, MessageUserInterface } from '../interfaces/Responses/Message';
 import { IUserShort } from '../interfaces/Model/User';
 import _ from 'lodash';
 import { Default500Response } from '../common/Constants/DefaultErrStatus';
@@ -91,8 +91,8 @@ export const GetMessages = async(currentUser: CurrentUser, roomKeys?: string[], 
 				path: 'sender',
 				select: '_id username'
 			})
-			.select('sender message connectionKey created_at')
-			.sort('-created_at')
+			.select('_id sender message connectionKey created_at')
+			.sort('created_at')
 			.limit(1000)
 			.skip(skip || 0)
 			.exec();
@@ -119,7 +119,7 @@ export const GetMessages = async(currentUser: CurrentUser, roomKeys?: string[], 
 	}
 };
 
-export const GetAllConnectionWithMessage = async(currentUser: CurrentUser): Promise<ControllerReturnType<IUserShort[]>> => {
+export const GetAllConnectionWithMessage = async(currentUser: CurrentUser): Promise<ControllerReturnType<MessageUserInterface[]>> => {
 	// 1. get all the message room keys from message table, by using currentUser as sender
 	// 2. get all the u1 from connection
 
@@ -142,9 +142,11 @@ export const GetAllConnectionWithMessage = async(currentUser: CurrentUser): Prom
 			})
 			.exec();
 		
-		const userList: IUserShort[] = connectionU1List.map(conn => ({
-			_id: conn.u1_id._id,
-			username: conn.u1_id.username
+		const userList: MessageUserInterface[] = connectionU1List.map(conn => ({
+			user: {_id: conn.u1_id._id,
+				username: conn.u1_id.username
+			}, 
+			connectionKey: conn.key
 		}));
 	
 		return {

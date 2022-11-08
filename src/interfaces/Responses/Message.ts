@@ -10,3 +10,8 @@ export interface Message {
 export interface MessageResponseObject {
 	[connectionKey: string] : Message[]
 }
+
+export interface MessageUserInterface {
+	user: IUserShort,
+	connectionKey: string
+}
