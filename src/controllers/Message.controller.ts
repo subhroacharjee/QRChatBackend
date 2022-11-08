@@ -104,6 +104,7 @@ export const GetMessages = async(currentUser: CurrentUser, roomKeys?: string[], 
 
 		_.forEach(groupedMessageObject, (value, key) => {
 			messages[key] = _.map(value, (doc) => ({
+				_id: doc._id,
 				sender: <IUserShort>doc.sender,
 				message: doc.message.trim(),
 				created_at: doc.created_at
@@ -124,9 +125,7 @@ export const GetAllConnectionWithMessage = async(currentUser: CurrentUser): Prom
 	// 2. get all the u1 from connection
 
 	try {
-		const keys = await MessageModel.find({
-			sender: currentUser._id
-		})
+		const keys = await MessageModel.find()
 			.select('connectionKey')
 			.distinct('connectionKey')
 			.exec();
@@ -143,6 +142,7 @@ export const GetAllConnectionWithMessage = async(currentUser: CurrentUser): Prom
 			.exec();
 		
 		const userList: MessageUserInterface[] = connectionU1List.map(conn => ({
+			_id: conn._id,
 			user: {_id: conn.u1_id._id,
 				username: conn.u1_id.username
 			}, 
