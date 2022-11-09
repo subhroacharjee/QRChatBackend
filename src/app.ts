@@ -26,7 +26,7 @@ Database.connect({
 
 const app = express();
 
-
+app.disable('etag');
 app.use(Cors());
 app.use(morgan('dev'));
 app.use(bodyParser.urlencoded({
